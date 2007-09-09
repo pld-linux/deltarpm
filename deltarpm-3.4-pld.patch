@@ -1,0 +1,12 @@
+diff -ruN deltarpm-3.4/Makefile deltarpm-3.4.new/Makefile
+--- deltarpm-3.4/Makefile	2007-09-09 14:28:40.228449568 +0000
++++ deltarpm-3.4.new/Makefile	2007-09-09 14:29:42.218992621 +0000
+@@ -1,6 +1,6 @@
+-prefix=/usr/local
++prefix=/usr
+ bindir=$(prefix)/bin
+-mandir=$(prefix)/man
++mandir=$(prefix)/share/man
+ rpmdumpheader=$(bindir)/rpmdumpheader
+ zlibdir=zlib-1.2.2.f-rsyncable
+ CFLAGS = -O2 -Wall -g

@@ -1,0 +1,131 @@
+diff -ur deltarpm-3.4a/applydeltarpm.c deltarpm-3.4b/applydeltarpm.c
+--- deltarpm-3.4a/applydeltarpm.c	2007-03-06 15:35:16.000000000 +0200
++++ deltarpm-3.4b/applydeltarpm.c	2007-07-11 17:36:59.000000000 +0300
+@@ -394,10 +394,7 @@
+ 	    {
+ 	      if (fd != -1)
+ 		{
+-		  if (isp)
+-		    prelinked_close(fd);
+-		  else
+-		    close(fd);
++		  close(fd);
+ 		  fd = -1;
+ 		}
+ 	      sd++;
+@@ -486,10 +483,7 @@
+ 		{
+ 		  if (fd)
+ 		    {
+-		      if (isp)
+-			prelinked_close(fd);
+-		      else
+-			close(fd);
++		      close(fd);
+ 		      fd = -1;
+ 		    }
+ 		  l2 = l > sd->datalen - o ? sd->datalen - o : l;
+@@ -996,7 +990,7 @@
+       rpmMD5Update(&ctx, buf, l);
+       size -= l;
+     }
+-  prelinked_close(fd);
++  close(fd);
+   rpmMD5Final(md5, &ctx);
+   if (memcmp(md5, hmd5, 16))
+     {
+diff -ur deltarpm-3.4a/prelink.c deltarpm-3.4b/prelink.c
+--- deltarpm-3.4a/prelink.c	2005-06-06 15:41:07.000000000 +0300
++++ deltarpm-3.4b/prelink.c	2007-07-11 17:42:49.000000000 +0300
+@@ -7,6 +7,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/wait.h>
++#include <fcntl.h>
+ 
+ static inline int
+ elf16(unsigned char *buf, int le)
+@@ -122,9 +123,10 @@
+ prelinked_open(char *name)
+ {
+   pid_t pid;
+-  int status;
++  int fd, status;
+   int p[2];
+   struct stat stb;
++  char template[21];
+ 
+   if (stat("/usr/sbin/prelink", &stb))
+     {
+@@ -132,49 +134,33 @@
+       fprintf(stderr, "prelink not installed, cannot undo prelinking");
+       exit(1);
+     }
+-  if (prelink_pid != (pid_t)-1)
++  strcpy(template, "/tmp/deltarpm.XXXXXX");
++  if ((fd = mkstemp(template)) == -1)
+     {
+-      waitpid(prelink_pid, &status, WNOHANG);
+-      prelink_pid = (pid_t)-1;
+-    }
+-  if (pipe(p))
+-    {
+-      perror("pipe");
++      perror("mkstemp");
+       exit(1);
+     }
++  close(fd);    /* prelink renames another tmpfile over our file */
+   pid = fork();
+   if (pid == (pid_t)(-1))
+     {
+       perror("fork");
+       exit(1);
+     }
+-  if (pid)
++  if (!pid)
+     {
+-      prelink_pid = pid;
+-      close(p[1]);
+-      return p[0];
++      execl("/usr/sbin/prelink", "prelink", "-o", template, "-u", name, (char *)0);
++      perror("/usr/sbin/prelink");
++      _exit(1);
+     }
+-  close(p[0]);
+-  if (p[1] != 1)
++  while (waitpid(pid, &status, 0) == (pid_t)-1)
++    ;
++  if ((fd = open(template, O_RDONLY)) == -1)
+     {
+-      dup2(p[1], 1);
+-      close(p[1]);
++      perror(template);
++      exit(1);
+     }
+-  execl("/usr/sbin/prelink", "prelink", "-y", name, (char *)0);
+-  perror("/usr/sbin/prelink");
+-  _exit(1);
++  unlink(template);
++  return fd; 
+ }
+ 
+-void
+-prelinked_close(int fd)
+-{
+-  int status;
+-
+-  close(fd);
+-  if (prelink_pid != (pid_t)-1)
+-    {
+-      kill(prelink_pid, SIGPIPE);
+-      if (waitpid(prelink_pid, &status, 0) == prelink_pid)
+-	prelink_pid = (pid_t)-1;
+-    }
+-}
+diff -ur deltarpm-3.4a/prelink.h deltarpm-3.4b/prelink.h
+--- deltarpm-3.4a/prelink.h	2005-06-02 20:01:07.000000000 +0300
++++ deltarpm-3.4b/prelink.h	2007-07-11 17:36:59.000000000 +0300
+@@ -1,3 +1,2 @@
+ extern int is_prelinked(int fd, unsigned char *buf, int l);
+ extern int prelinked_open(char *name);
+-extern void prelinked_close(int fd);

@@ -1,0 +1,28 @@
+diff -ur deltarpm-3.4b/makedeltarpm.c deltarpm-3.4a/makedeltarpm.c
+--- deltarpm-3.4b/makedeltarpm.c	2007-03-06 15:35:55.000000000 +0200
++++ deltarpm-3.4a/makedeltarpm.c	2007-04-04 21:13:04.000000000 +0300
+@@ -887,6 +887,13 @@
+ 		    fprintf(vfp, "skipping %s: bad file flags\n", np);
+ 		  skipped_fileflags++;
+ 		}
++	      else if ((fileflags[i] & FILE_DOC) != 0)
++		{
++		  if (verbose > 1)
++		    fprintf(vfp, "USING DOC %s\n", np);
++		  lsize = size;
++		  skip = 0;
++		}
+ 	      else if ((fileverify[i] & (VERIFY_MD5|VERIFY_FILESIZE)) != (VERIFY_MD5|VERIFY_FILESIZE))
+ 		{
+ 		  if (verbose > 1) 
+diff -ur deltarpm-3.4b/rpmhead.h deltarpm-3.4a/rpmhead.h
+--- deltarpm-3.4b/rpmhead.h	2007-03-06 15:35:55.000000000 +0200
++++ deltarpm-3.4a/rpmhead.h	2007-04-04 21:12:05.000000000 +0300
+@@ -35,6 +35,7 @@
+ #define SIGTAG_SHA1     269
+ 
+ #define FILE_CONFIG     (1 << 0)
++#define FILE_DOC        (1 << 1)
+ #define FILE_MISSINGOK  (1 << 3)
+ #define FILE_GHOST      (1 << 6)
+ #define FILE_UNPATCHED  (1 << 10)
