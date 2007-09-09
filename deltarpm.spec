@@ -39,10 +39,8 @@ takze już zainstalowane pakiety.
 
 %build
 %{__make} \
-	CFLAGS="$RPM_OPT_FLAGS" \
-	bindir=%{_bindir} \
-	mandir=%{_mandir} \
-	prefix=%{_prefix}
+	CFLAGS="%{rpmcflags} -I/usr/include/rpm" \
+	CC="%{__cc}"
 
 %install
 rm -rf $RPM_BUILD_ROOT
