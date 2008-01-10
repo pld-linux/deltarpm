@@ -25,9 +25,9 @@ rpm, deltarpms can also work with installed rpms.
 
 %description -l pl.UTF-8
 Deltarpm zawiera różnice pomiędzy starą i nową wersją pakietu rpm,
-pozwaljąc na stworzenie nowej wersji na podstawie delty i starej
-wersji. Nie jest konieczne posiadanie pakietu rpm, deltarpm wspiera
-takze już zainstalowane pakiety.
+pozwalając na stworzenie nowej wersji na podstawie delty i starej
+wersji. Nie jest konieczne posiadanie kopii starego pakietu rpm,
+deltarpm obsługuje także już zainstalowane pakiety.
 
 %prep
 %setup -q
