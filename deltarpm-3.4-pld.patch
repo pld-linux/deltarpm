@@ -10,3 +10,13 @@ diff -ruN deltarpm-3.4/Makefile deltarpm-3.4.new/Makefile
  rpmdumpheader=$(bindir)/rpmdumpheader
  zlibdir=zlib-1.2.2.f-rsyncable
  CFLAGS = -O2 -Wall -g
+--- deltarpm-3.5/Makefile.orig	2009-10-26 00:53:55.000000000 +0100
++++ deltarpm-3.5/Makefile	2009-10-26 00:54:50.000000000 +0100
+@@ -38,7 +38,6 @@
+ 	install -m 755 makedeltarpm  $(DESTDIR)$(bindir)
+ 	install -m 755 applydeltarpm $(DESTDIR)$(bindir)
+ 	install -m 755 combinedeltarpm $(DESTDIR)$(bindir)
+-	install -m 755 rpmdumpheader $(DESTDIR)$(rpmdumpheader)
+ 	install -m 755 makedeltaiso $(DESTDIR)$(bindir)
+ 	install -m 755 applydeltaiso $(DESTDIR)$(bindir)
+ 	install -m 755 fragiso $(DESTDIR)$(bindir)

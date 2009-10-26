@@ -1,20 +1,18 @@
 Summary:	Create deltas between rpms
 Summary(pl.UTF-8):	Generowanie różnic między pakietami rpm
 Name:		deltarpm
-Version:	3.4
+Version:	3.5
 Release:	1
 License:	BSD
 Group:		Base
 Source0:	ftp://ftp.suse.com/pub/projects/deltarpm/%{name}-%{version}.tar.bz2
-# Source0-md5:  cac779a18a1bc256fb6497526a83ac82
-Patch0:		%{name}-3.4-multilib-workaround.patch
-Patch1:		%{name}-3.4-multilib-include-colored.patch
-Patch2:		%{name}-3.4-prelink-bugfix.patch
-Patch3:		%{name}-3.4-no-skip-doc.patch
-Patch4:		%{name}-3.4-pld.patch
+# Source0-md5:	df656d5cbba98e4cc1fc8e18a31f1f3b
+Patch0:		%{name}-3.4-no-skip-doc.patch
+Patch1:		%{name}-3.4-pld.patch
 URL:		http://www.novell.com/products/linuxpackages/professional/deltarpm.html
 BuildRequires:	bzip2-devel
 BuildRequires:	rpm-devel
+BuildRequires:	zlib-static
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -31,15 +29,13 @@ deltarpm obsługuje także już zainstalowane pakiety.
 
 %prep
 %setup -q
-%patch0 -p0
+%patch0 -p1
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
-%patch4 -p1
 
 %build
-%{__make} \
-	CFLAGS="%{rpmcflags} -I/usr/include/rpm" \
+# fix rpmdumpheader
+%{__make} makedeltarpm applydeltarpm makedeltaiso applydeltaiso combinedeltarpm fragiso \
+	CFLAGS="%{rpmcflags} -I/usr/include/rpm" zlibdir=%{_libdir}\
 	CC="%{__cc}"
 
 %install
