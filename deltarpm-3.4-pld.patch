@@ -1,6 +1,72 @@
-diff -ruN deltarpm-3.4/Makefile deltarpm-3.4.new/Makefile
---- deltarpm-3.4/Makefile	2007-09-09 14:28:40.228449568 +0000
-+++ deltarpm-3.4.new/Makefile	2007-09-09 14:29:42.218992621 +0000
+diff -u deltarpm-3.5/cfile.c deltarpm-pld/cfile.c
+--- deltarpm-3.5/cfile.c	2009-07-29 14:50:48.000000000 +0200
++++ deltarpm-pld/cfile.c	2010-06-17 01:27:15.000000000 +0200
+@@ -658,7 +658,8 @@
+ {
+   lzma_stream tmp = LZMA_STREAM_INIT;
+   f->strm.lz = tmp;
+-  if (lzma_auto_decoder(&f->strm.lz, 1 << 25, 0) != LZMA_OK)
++  //if (lzma_auto_decoder(&f->strm.lz, 1 << 25, 0) != LZMA_OK)
++  if (lzma_auto_decoder(&f->strm.lz, 1 << 27, 0) != LZMA_OK)
+     {
+       free(f);
+       return 0;
+@@ -1119,6 +1120,10 @@
+ 	    comp = CFILE_COMP_LZMA;
+ 	  else if (f->buf[0] == 0135 && f->buf[1] == 0 && f->buf[2] == 0)
+ 	    comp = CFILE_COMP_LZMA;
++	  else if (f->buf[0] == 0 && f->buf[1] == 0x5d && f->buf[2] == 0 && f->buf[3] == 0)
++	    comp = CFILE_COMP_LZMA;
++	  else if (f->buf[0] == 0 && f->buf[1] == 0x03 && f->buf[2] == 0 && f->buf[3] == 0)
++	    comp = CFILE_COMP_LZMA;
+ 	  else if (f->buf[0] == 0xfd && f->buf[1] == '7' && f->buf[2] == 'z' && f->buf[3] == 'X' && f->buf[4] == 'Z')
+ 	    comp = CFILE_COMP_XZ;
+ 	}
+@@ -1245,6 +1250,7 @@
+     case CFILE_COMP_GZ:
+     case CFILE_COMP_GZ_RSYNC:
+     case CFILE_COMP_BZ:
++    case CFILE_COMP_LZMA:
+       deflevel = 9;
+       break;
+     default:
+diff -u deltarpm-3.5-old/makedeltarpm.c deltarpm/makedeltarpm.c
+--- deltarpm-3.5-old/makedeltarpm.c	2009-08-18 15:18:13.000000000 +0200
++++ deltarpm/makedeltarpm.c	2010-06-17 01:01:12.000000000 +0200
+@@ -833,13 +833,16 @@
+     bfd = cfile_open(CFILE_OPEN_RD, CFILE_IO_BUFFER, newcpio, CFILE_COMP_UN, newcpiolen, 0, 0);
+   else
+     bfd = cfile_open(CFILE_OPEN_RD, fd, 0, CFILE_COMP_XX, CFILE_LEN_UNLIMITED, 0, 0);
++  
+   if (!bfd)
+     {
+       fprintf(stderr, "payload open failed\n");
+       exit(1);
+     }
++    
+   if (verbose && !alone)
+     fprintf(vfp, "reading old rpm...\n");
++  
+   if (rpmonly)
+     {
+       while ((l = bfd->read(bfd, buf, sizeof(buf))) > 0)
+@@ -1188,11 +1198,11 @@
+ 	  fprintf(stderr, "payload open failed\n");
+ 	  exit(1);
+ 	}
+-      if (cfile_detect_rsync(newbz))
++/*      if (cfile_detect_rsync(newbz))
+ 	{
+ 	  fprintf(stderr, "detect_rsync failed\n");
+ 	  exit(1);
+-	}
++	}*/
+       targetcomp = newbz->comp;
+       if ((payloadflags = headstring(d.h, TAG_PAYLOADFLAGS)) != 0)
+ 	if (*payloadflags >= '1' && *payloadflags <= '9')
+diff -u deltarpm-3.5/Makefile deltarpm-pld/Makefile
+--- deltarpm-3.5/Makefile	2009-07-21 16:27:17.000000000 +0200
++++ deltarpm-pld/Makefile	2010-06-16 22:42:11.000000000 +0200
 @@ -1,6 +1,6 @@
 -prefix=/usr/local
 +prefix=/usr
@@ -10,9 +76,7 @@ diff -ruN deltarpm-3.4/Makefile deltarpm-3.4.new/Makefile
  rpmdumpheader=$(bindir)/rpmdumpheader
  zlibdir=zlib-1.2.2.f-rsyncable
  CFLAGS = -O2 -Wall -g
---- deltarpm-3.5/Makefile.orig	2009-10-26 00:53:55.000000000 +0100
-+++ deltarpm-3.5/Makefile	2009-10-26 00:54:50.000000000 +0100
-@@ -38,7 +38,6 @@
+@@ -38,7 +39,6 @@
  	install -m 755 makedeltarpm  $(DESTDIR)$(bindir)
  	install -m 755 applydeltarpm $(DESTDIR)$(bindir)
  	install -m 755 combinedeltarpm $(DESTDIR)$(bindir)

@@ -1,7 +1,7 @@
-diff -ur deltarpm-3.4b/makedeltarpm.c deltarpm-3.4a/makedeltarpm.c
---- deltarpm-3.4b/makedeltarpm.c	2007-03-06 15:35:55.000000000 +0200
-+++ deltarpm-3.4a/makedeltarpm.c	2007-04-04 21:13:04.000000000 +0300
-@@ -887,6 +887,13 @@
+diff -u deltarpm-3.5/makedeltarpm.c deltarpm-pld/makedeltarpm.c
+--- deltarpm-3.5/makedeltarpm.c	2009-08-18 15:18:13.000000000 +0200
++++ deltarpm-pld/makedeltarpm.c	2010-06-17 01:01:12.000000000 +0200
+@@ -926,6 +929,13 @@
  		    fprintf(vfp, "skipping %s: bad file flags\n", np);
  		  skipped_fileflags++;
  		}
@@ -14,11 +14,11 @@ diff -ur deltarpm-3.4b/makedeltarpm.c deltarpm-3.4a/makedeltarpm.c
 +		}
  	      else if ((fileverify[i] & (VERIFY_MD5|VERIFY_FILESIZE)) != (VERIFY_MD5|VERIFY_FILESIZE))
  		{
- 		  if (verbose > 1) 
-diff -ur deltarpm-3.4b/rpmhead.h deltarpm-3.4a/rpmhead.h
---- deltarpm-3.4b/rpmhead.h	2007-03-06 15:35:55.000000000 +0200
-+++ deltarpm-3.4a/rpmhead.h	2007-04-04 21:12:05.000000000 +0300
-@@ -35,6 +35,7 @@
+ 		  if (verbose > 1)
+diff -u deltarpm-3.5/rpmhead.h deltarpm-pld/rpmhead.h
+--- deltarpm-3.5/rpmhead.h	2009-07-21 15:41:08.000000000 +0200
++++ deltarpm-pld/rpmhead.h	2009-10-26 00:57:40.000000000 +0100
+@@ -38,6 +38,7 @@
  #define SIGTAG_SHA1     269
  
  #define FILE_CONFIG     (1 << 0)
