@@ -2,13 +2,14 @@ Summary:	Create deltas between rpms
 Summary(pl.UTF-8):	Generowanie różnic między pakietami rpm
 Name:		deltarpm
 Version:	3.5
-Release:	2
+Release:	3
 License:	BSD
 Group:		Base
 Source0:	ftp://ftp.suse.com/pub/projects/deltarpm/%{name}-%{version}.tar.bz2
 # Source0-md5:	df656d5cbba98e4cc1fc8e18a31f1f3b
 Patch0:		%{name}-3.4-no-skip-doc.patch
 Patch1:		%{name}-3.4-pld.patch
+Patch2:		%{name}-rpmdumpheader.patch
 URL:		http://www.novell.com/products/linuxpackages/professional/deltarpm.html
 BuildRequires:	bzip2-devel
 BuildRequires:	rpm-devel
@@ -31,10 +32,10 @@ deltarpm obsługuje także już zainstalowane pakiety.
 %setup -q
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
-# fix rpmdumpheader
-%{__make} makedeltarpm applydeltarpm makedeltaiso applydeltaiso combinedeltarpm fragiso \
+%{__make} \
 	CFLAGS="%{rpmcflags} -I/usr/include/rpm" zlibdir=%{_libdir}\
 	CC="%{__cc}"
 
