@@ -76,11 +76,3 @@ diff -u deltarpm-3.5/Makefile deltarpm-pld/Makefile
  rpmdumpheader=$(bindir)/rpmdumpheader
  zlibdir=zlib-1.2.2.f-rsyncable
  CFLAGS = -O2 -Wall -g
-@@ -38,7 +39,6 @@
- 	install -m 755 makedeltarpm  $(DESTDIR)$(bindir)
- 	install -m 755 applydeltarpm $(DESTDIR)$(bindir)
- 	install -m 755 combinedeltarpm $(DESTDIR)$(bindir)
--	install -m 755 rpmdumpheader $(DESTDIR)$(rpmdumpheader)
- 	install -m 755 makedeltaiso $(DESTDIR)$(bindir)
- 	install -m 755 applydeltaiso $(DESTDIR)$(bindir)
- 	install -m 755 fragiso $(DESTDIR)$(bindir)
