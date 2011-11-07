@@ -1,5 +1,5 @@
 %define		subver	20110223
-%define		rel		1
+%define		rel		2
 Summary:	Create deltas between rpms
 Summary(pl.UTF-8):	Generowanie różnic między pakietami rpm
 Name:		deltarpm
@@ -39,6 +39,7 @@ deltarpm obsługuje także już zainstalowane pakiety.
 Summary:	Sync a file tree with deltarpms
 Group:		Base
 Requires:	%{name} = %{version}-%{release}
+Suggests:	deltaiso
 
 %description -n drpmsync
 This package contains a tool to sync a file tree with deltarpms.
