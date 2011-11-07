@@ -55,7 +55,7 @@ difference between an old and a new iso containing rpms.
 %package -n python-deltarpm
 Summary:	Python bindings for deltarpm
 Group:		Base
-Requires:	%{name} = %{version}-%{release}
+# does not require base package
 
 %description -n python-deltarpm
 This package contains python bindings for deltarpm.
