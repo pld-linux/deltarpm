@@ -1,4 +1,3 @@
-diff -u deltarpm-3.5/cfile.c deltarpm-pld/cfile.c
 --- deltarpm-3.5/cfile.c	2009-07-29 14:50:48.000000000 +0200
 +++ deltarpm-pld/cfile.c	2010-06-17 01:27:15.000000000 +0200
 @@ -658,7 +658,8 @@
@@ -30,49 +29,31 @@ diff -u deltarpm-3.5/cfile.c deltarpm-pld/cfile.c
        deflevel = 9;
        break;
      default:
-diff -u deltarpm-3.5-old/makedeltarpm.c deltarpm/makedeltarpm.c
---- deltarpm-3.5-old/makedeltarpm.c	2009-08-18 15:18:13.000000000 +0200
-+++ deltarpm/makedeltarpm.c	2010-06-17 01:01:12.000000000 +0200
-@@ -833,13 +833,16 @@
-     bfd = cfile_open(CFILE_OPEN_RD, CFILE_IO_BUFFER, newcpio, CFILE_COMP_UN, newcpiolen, 0, 0);
-   else
-     bfd = cfile_open(CFILE_OPEN_RD, fd, 0, CFILE_COMP_XX, CFILE_LEN_UNLIMITED, 0, 0);
-+  
-   if (!bfd)
-     {
+--- deltarpm-git-20110223/makedeltarpm.c~	2011-11-07 22:27:12.000000000 +0200
++++ deltarpm-git-20110223/makedeltarpm.c	2011-11-07 22:27:52.884618404 +0200
+@@ -1080,11 +1080,13 @@
        fprintf(stderr, "payload open failed\n");
        exit(1);
      }
-+    
-   if (verbose && !alone)
-     fprintf(vfp, "reading old rpm...\n");
-+  
-   if (rpmonly)
++/*
+   if (cfile_detect_rsync(newbz))
      {
-       while ((l = bfd->read(bfd, buf, sizeof(buf))) > 0)
-@@ -1188,11 +1198,11 @@
- 	  fprintf(stderr, "payload open failed\n");
- 	  exit(1);
- 	}
--      if (cfile_detect_rsync(newbz))
-+/*      if (cfile_detect_rsync(newbz))
- 	{
- 	  fprintf(stderr, "detect_rsync failed\n");
- 	  exit(1);
--	}
-+	}*/
-       targetcomp = newbz->comp;
-       if ((payloadflags = headstring(d.h, TAG_PAYLOADFLAGS)) != 0)
- 	if (*payloadflags >= '1' && *payloadflags <= '9')
-diff -u deltarpm-3.5/Makefile deltarpm-pld/Makefile
---- deltarpm-3.5/Makefile	2009-07-21 16:27:17.000000000 +0200
-+++ deltarpm-pld/Makefile	2010-06-16 22:42:11.000000000 +0200
-@@ -1,6 +1,6 @@
+       fprintf(stderr, "detect_rsync failed\n");
+       exit(1);
+     }
++*/
+   targetcomp = newbz->comp;
+   if ((payloadflags = headstring(d.h, TAG_PAYLOADFLAGS)) != 0)
+     if (*payloadflags >= '1' && *payloadflags <= '9')
+--- deltarpm-git-20110223/Makefile~	2011-02-19 18:53:23.000000000 +0200
++++ deltarpm-git-20110223/Makefile	2011-11-07 22:29:01.877800526 +0200
+@@ -1,7 +1,7 @@
 -prefix=/usr/local
 +prefix=/usr
  bindir=$(prefix)/bin
+ libdir=$(prefix)/lib
 -mandir=$(prefix)/man
 +mandir=$(prefix)/share/man
  rpmdumpheader=$(bindir)/rpmdumpheader
  zlibdir=zlib-1.2.2.f-rsyncable
- CFLAGS = -O2 -Wall -g
+ zlibbundled=$(zlibdir)/libz.a
