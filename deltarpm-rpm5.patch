@@ -1,0 +1,136 @@
+--- deltarpm-git-20110223/Makefile.orig	2012-08-28 14:36:04.972108891 -0300
++++ deltarpm-git-20110223/Makefile	2012-08-28 14:36:45.929107787 -0300
+@@ -9,28 +9,33 @@ zlibldflags=$(zlibbundled)
+ zlibcppflags=-I$(zlibdir)
+ pylibprefix=/
+ CFLAGS = -fPIC -O2 -Wall -g
+-CPPFLAGS = -fPIC -DDELTARPM_64BIT -DBSDIFF_NO_SUF -DRPMDUMPHEADER=\"$(rpmdumpheader)\" $(zlibcppflags)
+-LDLIBS = -lbz2 $(zlibldflags) -llzma
+-LDFLAGS =
++CPPFLAGS = -fPIC -DDELTARPM_64BIT -DBSDIFF_NO_SUF -DRPMDUMPHEADER=\"$(rpmdumpheader)\" $(zlibcppflags) $(shell pkg-config --cflags rpm)
++LIBS = -lbz2 $(zlibldflags) $(shell pkg-config --libs rpm) $(shell pkg-config --libs liblzma)
+ 
+ all: makedeltarpm applydeltarpm rpmdumpheader makedeltaiso applydeltaiso combinedeltarpm fragiso
+ 
+ python: _deltarpmmodule.so
+ 
+ makedeltarpm: makedeltarpm.o writedeltarpm.o md5.o util.o rpml.o rpmhead.o cpio.o delta.o cfile.o $(zlibbundled)
++	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $^ $ -o $@ $(LIBS)
+ 
+ applydeltarpm: applydeltarpm.o readdeltarpm.o md5.o sha256.o util.o rpmhead.o cpio.o cfile.o prelink.o $(zlibbundled)
++	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $^ $ -o $@ $(LIBS)
+ 
+ combinedeltarpm: combinedeltarpm.o md5.o util.o rpmhead.o cfile.o readdeltarpm.o writedeltarpm.o $(zlibbundled)
++	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $^ $ -o $@ $(LIBS)
+ 
+ rpmdumpheader: rpmdumpheader.o
+-	$(CC) $(LDFLAGS) $^ -lrpm -lrpmio -o $@
++	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $^ $ -o $@ $(LIBS)
+ 
+ makedeltaiso: makedeltaiso.o delta.o rpmoffs.o rpmhead.o util.o md5.o cfile.o $(zlibbundled)
++	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $^ $ -o $@ $(LIBS)
+ 
+ applydeltaiso: applydeltaiso.o util.o md5.o cfile.o $(zlibbundled)
++	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $^ $ -o $@ $(LIBS)
+ 
+ fragiso: fragiso.o util.o md5.o rpmhead.o cfile.o $(zlibbundled)
++	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $^ $ -o $@ $(LIBS)
+ 
+ _deltarpmmodule.so: readdeltarpm.o rpmhead.o util.o md5.o cfile.o $(zlibbundled)
+ 	for PY in python python3 ; do \
+@@ -41,13 +46,13 @@ _deltarpmmodule.so: readdeltarpm.o rpmhe
+ 			if [ ! -f "python$$PYVER/$@" ]; then \
+ 				mkdir -p python$$PYVER ;\
+ 				$(CC) $(CFLAGS) $$PYCFLAGS $(zlibcppflag) -fPIC -c -o python$$PYVER/deltarpmmodule.o deltarpmmodule.c ;\
+-				$(CC) -o python$$PYVER/$@ python$$PYVER/deltarpmmodule.o $^ -shared -Wl,-soname,_deltarpmmodule.so $(LDLIBS) $$PYLDFLAGS; \
++				$(CC) -o python$$PYVER/$@ python$$PYVER/deltarpmmodule.o $^ -shared -Wl,-soname,_deltarpmmodule.so $(LIBS) $$PYLDFLAGS; \
+ 			fi; \
+ 		fi; \
+ 	done
+ 
+ $(zlibbundled):
+-	cd $(zlibdir) ; make CFLAGS="-fPIC $(CFLAGS)" libz.a
++	cd $(zlibdir) ; make CPPFLAGS="$(CPPFLAGS)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" libz.a
+ 
+ clean:
+ 	rm -f *.o
+@@ -59,7 +64,7 @@ install:
+ 	install -m 755 makedeltarpm  $(DESTDIR)$(bindir)
+ 	install -m 755 applydeltarpm $(DESTDIR)$(bindir)
+ 	install -m 755 combinedeltarpm $(DESTDIR)$(bindir)
+-	install -m 755 rpmdumpheader $(DESTDIR)$(rpmdumpheader)
++	install -m 755 rpmdumpheader -D $(DESTDIR)$(rpmdumpheader)
+ 	install -m 755 makedeltaiso $(DESTDIR)$(bindir)
+ 	install -m 755 applydeltaiso $(DESTDIR)$(bindir)
+ 	install -m 755 fragiso $(DESTDIR)$(bindir)
+--- deltarpm-git-20110223/rpmdumpheader.c.orig	2012-08-28 14:36:14.336108640 -0300
++++ deltarpm-git-20110223/rpmdumpheader.c	2012-08-28 14:36:17.157108563 -0300
+@@ -7,15 +7,23 @@
+ 
+ #include <fcntl.h>
+ #include <string.h>
+-#include <rpm/rpmlib.h>
+-#include <rpm/rpmts.h>
+-#include <rpm/rpmdb.h>
++#include <stdint.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <rpmrc.h>
++#include <rpmtypes.h>
++#include <rpmtag.h>
++#include <rpmlog.h>
++#include <rpmio.h>
++#include <rpmts.h>
++#include <rpmdb.h>
++#include <pkgio.h>
+ 
+ int main(int argc, char **argv)
+ {
+   FD_t fdo;
+   rpmts ts = NULL;
+-  rpmdbMatchIterator mi;
++  rpmmi mi;
+   Header h;
+   int ret = 0;
+ 
+@@ -66,16 +74,24 @@ int main(int argc, char **argv)
+   ts = rpmtsCreate();
+   
+   mi = rpmtsInitIterator(ts, RPMTAG_NAME, n, 0);
+-  rpmdbSetIteratorRE(mi, RPMTAG_EPOCH, RPMMIRE_STRCMP, e);
+-  rpmdbSetIteratorRE(mi, RPMTAG_VERSION, RPMMIRE_STRCMP, v);
+-  rpmdbSetIteratorRE(mi, RPMTAG_RELEASE, RPMMIRE_STRCMP, r);
++  rpmmiAddPattern(mi, RPMTAG_EPOCH, RPMMIRE_STRCMP, e);
++  rpmmiAddPattern(mi, RPMTAG_VERSION, RPMMIRE_STRCMP, v);
++  rpmmiAddPattern(mi, RPMTAG_RELEASE, RPMMIRE_STRCMP, r);
+   if (a)
+-    rpmdbSetIteratorRE(mi, RPMTAG_ARCH, RPMMIRE_STRCMP, a);
++    rpmmiAddPattern(mi, RPMTAG_ARCH, RPMMIRE_STRCMP, a);
+ 
+-  if ((h = rpmdbNextIterator(mi)) != NULL)
++  if ((h = rpmmiNext(mi)) != NULL)
+     {
+-      fdo = Fopen("-", "w.ufdio");
+-      headerWrite(fdo, h, HEADER_MAGIC_YES);
++	rpmRC rc;
++	const char item[] = "Header";
++	const char * msg = NULL;
++
++      	fdo = Fopen("-", "w.ufdio");
++	rc = rpmpkgWrite(item, (FD_t)fdo, h, &msg);
++	if (rc != RPMRC_OK) {
++		rpmlog(RPMLOG_ERR, "%s: %s: %s\n", "headerWrite", item, msg);
++	}
++	msg = (const char*)_free(msg);
+     }
+   else
+     {
+@@ -85,7 +101,7 @@ int main(int argc, char **argv)
+ 	fprintf(stderr, "%s-%s-%s%s%s is not installed\n", n, v, r, a ? "." : "", a ? a : "");
+       ret = 1;
+     }
+-  mi = rpmdbFreeIterator(mi);
++  mi = rpmmiFree(mi);
+   ts = rpmtsFree(ts);
+   exit(ret);
+ }

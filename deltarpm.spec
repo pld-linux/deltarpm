@@ -11,7 +11,7 @@ Source0:	http://pkgs.fedoraproject.org/repo/pkgs/deltarpm/%{name}-git-%{subver}.
 # Source0-md5:	70f8884be63614ca7c3fc888cf20ebc8
 Patch0:		%{name}-3.4-no-skip-doc.patch
 Patch1:		%{name}-3.4-pld.patch
-Patch2:		%{name}-rpmdumpheader.patch
+Patch2:		%{name}-rpm5.patch
 URL:		http://www.novell.com/products/linuxpackages/opensuse/deltarpm.html
 BuildRequires:	bzip2-devel
 BuildRequires:	popt-devel
