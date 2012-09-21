@@ -1,5 +1,5 @@
 %define		subver	20110223
-%define		rel		2
+%define		rel		3
 Summary:	Create deltas between rpms
 Summary(pl.UTF-8):	Generowanie różnic między pakietami rpm
 Name:		deltarpm
