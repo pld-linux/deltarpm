@@ -1,14 +1,12 @@
-%define		subver	20110223
-%define		rel		5
 Summary:	Create deltas between rpms
 Summary(pl.UTF-8):	Generowanie różnic między pakietami rpm
 Name:		deltarpm
 Version:	3.6
-Release:	0.%{subver}git.%{rel}
+Release:	1
 License:	BSD
 Group:		Base
-Source0:	http://pkgs.fedoraproject.org/repo/pkgs/deltarpm/%{name}-git-%{subver}.tar.bz2/70f8884be63614ca7c3fc888cf20ebc8/deltarpm-git-%{subver}.tar.bz2
-# Source0-md5:	70f8884be63614ca7c3fc888cf20ebc8
+Source0:	ftp://ftp.suse.com/pub/projects/deltarpm/%{name}-%{version}.tar.bz2
+# Source0-md5:	2cc2690bd1088cfc3238c25e59aaaec1
 Patch0:		%{name}-3.4-no-skip-doc.patch
 Patch1:		%{name}-3.4-pld.patch
 Patch2:		%{name}-rpm5.patch
@@ -62,7 +60,7 @@ Group:		Base
 This package contains python bindings for deltarpm.
 
 %prep
-%setup -q -n %{name}-git-%{subver}
+%setup -q
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
@@ -108,6 +106,7 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/fragiso
 %attr(755,root,root) %{_bindir}/makedeltaiso
 %{_mandir}/man8/applydeltaiso*
+%{_mandir}/man8/fragiso.8*
 %{_mandir}/man8/makedeltaiso*
 
 %files -n drpmsync
