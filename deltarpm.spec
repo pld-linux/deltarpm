@@ -28,13 +28,14 @@ deltarpm and the old one. You don't have to have a copy of the old
 rpm, deltarpms can also work with installed rpms.
 
 %description -l pl.UTF-8
-Deltarpm zawiera różnice pomiędzy starą i nową wersją pakietu rpm,
+Deltarpm zawiera różnice pomiędzy starą i nową wersją pakietu RPM,
 pozwalając na stworzenie nowej wersji na podstawie delty i starej
-wersji. Nie jest konieczne posiadanie kopii starego pakietu rpm,
+wersji. Nie jest konieczne posiadanie kopii starego pakietu RPM,
 deltarpm obsługuje także już zainstalowane pakiety.
 
 %package -n drpmsync
 Summary:	Sync a file tree with deltarpms
+Summary(pl.UTF-8):	Synchronizacja drzewa plików deltarpm
 Group:		Base
 Requires:	%{name} = %{version}-%{release}
 Suggests:	deltaiso
@@ -42,22 +43,35 @@ Suggests:	deltaiso
 %description -n drpmsync
 This package contains a tool to sync a file tree with deltarpms.
 
+%description -n drpmsync -l pl.UTF-8
+Ten pakiet zawiera narzędzie do synchronizacji drzewa plików deltarpm.
+
 %package -n deltaiso
 Summary:	Create deltas between isos containing rpms
+Summary(pl.UTF-8):	Tworzenie różnic między obrazami ISO zawierającymi pakiety RPM
 Group:		Base
 Requires:	%{name} = %{version}-%{release}
 
 %description -n deltaiso
-This package contains tools for creating and using deltasisos, a
+This package contains tools for creating and using deltaisos, a
 difference between an old and a new iso containing rpms.
+
+%description -n deltaiso -l pl.UTF-8
+Ten pakiet zawiera narzędzia do tworzenia i wykorzystywania plików
+deltaiso - różnic między starymi a nowymi obrazami ISO zawierającymi
+pakiety RPM.
 
 %package -n python-deltarpm
 Summary:	Python bindings for deltarpm
+Summary(pl.UTF-8):	Wiązania Pythona do deltarpm
 Group:		Base
 # does not require base package
 
 %description -n python-deltarpm
-This package contains python bindings for deltarpm.
+This package contains Python bindings for deltarpm.
+
+%description -n python-deltarpm -l pl.UTF-8
+Ten pakiet zawiera wiązania Pythona do deltarpm.
 
 %prep
 %setup -q
@@ -68,14 +82,27 @@ This package contains python bindings for deltarpm.
 %{__sed} -i -e 's/python3//' Makefile
 
 %build
-%{__make} CC="%{__cc}" CFLAGS="%{rpmcflags} -I/usr/include/rpm" \
-	bindir=%{_bindir} libdir=%{_libdir} mandir=%{_mandir} prefix=%{_prefix} \
-	zlibbundled='' zlibldflags='-lz' zlibcppflags=''
+%{__make} \
+	CC="%{__cc}" \
+	CFLAGS="%{rpmcflags} -I/usr/include/rpm" \
+	bindir=%{_bindir} \
+	libdir=%{_libdir} \
+	mandir=%{_mandir} \
+	prefix=%{_prefix} \
+	zlibbundled='' \
+	zlibldflags='-lz' \
+	zlibcppflags=''
 
-%{__make} CC="%{__cc}" CFLAGS="%{rpmcflags}" \
-	bindir=%{_bindir} libdir=%{_libdir} mandir=%{_mandir} prefix=%{_prefix} \
-	zlibbundled='' zlibldflags='-lz' zlibcppflags='' \
-	python
+%{__make} python \
+	CC="%{__cc}" \
+	CFLAGS="%{rpmcflags}" \
+	bindir=%{_bindir} \
+	libdir=%{_libdir} \
+	mandir=%{_mandir} \
+	prefix=%{_prefix} \
+	zlibbundled='' \
+	zlibldflags='-lz' \
+	zlibcppflags=''
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -105,14 +132,14 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/applydeltaiso
 %attr(755,root,root) %{_bindir}/fragiso
 %attr(755,root,root) %{_bindir}/makedeltaiso
-%{_mandir}/man8/applydeltaiso*
+%{_mandir}/man8/applydeltaiso.8*
 %{_mandir}/man8/fragiso.8*
-%{_mandir}/man8/makedeltaiso*
+%{_mandir}/man8/makedeltaiso.8*
 
 %files -n drpmsync
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/drpmsync
-%{_mandir}/man8/drpmsync*
+%{_mandir}/man8/drpmsync.8*
 
 %files -n python-deltarpm
 %defattr(644,root,root,755)
