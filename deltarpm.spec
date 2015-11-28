@@ -2,7 +2,7 @@ Summary:	Create deltas between rpms
 Summary(pl.UTF-8):	Generowanie różnic między pakietami rpm
 Name:		deltarpm
 Version:	3.6
-Release:	2
+Release:	3
 License:	BSD
 Group:		Base
 Source0:	ftp://ftp.suse.com/pub/projects/deltarpm/%{name}-%{version}.tar.bz2
