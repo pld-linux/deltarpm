@@ -2,7 +2,7 @@ Summary:	Create deltas between rpms
 Summary(pl.UTF-8):	Generowanie różnic między pakietami rpm
 Name:		deltarpm
 Version:	3.6
-Release:	3
+Release:	4
 License:	BSD
 Group:		Base
 Source0:	ftp://ftp.suse.com/pub/projects/deltarpm/%{name}-%{version}.tar.bz2
@@ -10,6 +10,7 @@ Source0:	ftp://ftp.suse.com/pub/projects/deltarpm/%{name}-%{version}.tar.bz2
 Patch0:		%{name}-3.4-no-skip-doc.patch
 Patch1:		%{name}-3.4-pld.patch
 Patch2:		%{name}-rpm5.patch
+Patch3:		python-install.patch
 URL:		http://www.novell.com/products/linuxpackages/opensuse/deltarpm.html
 BuildRequires:	bzip2-devel
 BuildRequires:	popt-devel
@@ -78,6 +79,7 @@ Ten pakiet zawiera wiązania Pythona do deltarpm.
 %patch0 -p1
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 %{__sed} -i -e 's/python3//' Makefile
 

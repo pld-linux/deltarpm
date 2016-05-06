@@ -1,0 +1,11 @@
+--- deltarpm-3.6/Makefile~	2016-05-06 09:12:02.000000000 +0200
++++ deltarpm-3.6/Makefile	2016-05-06 09:12:37.798574123 +0200
+@@ -79,7 +79,7 @@
+ 	install -m 644 drpmsync.8 $(DESTDIR)$(mandir)/man8
+ 	for PY in $(PYTHONS) ; do \
+ 		if [ -x /usr/bin/$$PY ]; then \
+-                        PYLIB=`$$PY -c 'from distutils import sysconfig ; print(sysconfig.get_python_lib(1))'` ; \
++                        PYLIB=`$$PY -c 'from distutils import sysconfig ; print(sysconfig.get_python_lib(1,prefix="$(prefix)"))'` ; \
+ 			PYVER=`$$PY -c 'from distutils import sysconfig ; print(sysconfig.get_python_version())'` ; \
+ 			if [ -e python$$PYVER/_deltarpmmodule.so ]; then \
+ 				mkdir -p $(DESTDIR)$(pylibprefix)$$PYLIB ; \
