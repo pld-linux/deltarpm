@@ -1,23 +1,29 @@
+#
+# Conditional build:
+%bcond_without	python3	# CPython3 module
+#
 Summary:	Create deltas between rpms
 Summary(pl.UTF-8):	Generowanie różnic między pakietami rpm
 Name:		deltarpm
-Version:	3.6
-Release:	4
+Version:	3.6.1
+Release:	1
 License:	BSD
 Group:		Base
-Source0:	ftp://ftp.suse.com/pub/projects/deltarpm/%{name}-%{version}.tar.bz2
-# Source0-md5:	2cc2690bd1088cfc3238c25e59aaaec1
+#Source0Download: https://github.com/rpm-software-management/deltarpm/releases
+Source0:	https://github.com/rpm-software-management/deltarpm/archive/%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	c48086229bdfcf5af890f104231180c6
 Patch0:		%{name}-3.4-no-skip-doc.patch
 Patch1:		%{name}-3.4-pld.patch
 Patch2:		%{name}-rpm5.patch
 Patch3:		python-install.patch
-URL:		http://www.novell.com/products/linuxpackages/opensuse/deltarpm.html
+URL:		https://github.com/rpm-software-management/deltarpm
 BuildRequires:	bzip2-devel
 BuildRequires:	popt-devel
-BuildRequires:	python-devel
+BuildRequires:	python-devel >= 2
+%{?with_python3:BuildRequires:	python3-devel >= 1:3.2}
 BuildRequires:	rpm-devel
 BuildRequires:	rpm-pythonprov
-BuildRequires:	rpmbuild(macros) >= 1.219
+BuildRequires:	rpmbuild(macros) >= 1.507
 BuildRequires:	xz-devel
 BuildRequires:	zlib-static
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -63,16 +69,28 @@ deltaiso - różnic między starymi a nowymi obrazami ISO zawierającymi
 pakiety RPM.
 
 %package -n python-deltarpm
-Summary:	Python bindings for deltarpm
-Summary(pl.UTF-8):	Wiązania Pythona do deltarpm
-Group:		Base
+Summary:	Python 2 bindings for deltarpm
+Summary(pl.UTF-8):	Wiązania Pythona 2 do deltarpm
+Group:		Libraries/Python
 # does not require base package
 
 %description -n python-deltarpm
-This package contains Python bindings for deltarpm.
+This package contains Python 2 bindings for deltarpm.
 
 %description -n python-deltarpm -l pl.UTF-8
-Ten pakiet zawiera wiązania Pythona do deltarpm.
+Ten pakiet zawiera wiązania Pythona 2 do deltarpm.
+
+%package -n python3-deltarpm
+Summary:	Python 3 bindings for deltarpm
+Summary(pl.UTF-8):	Wiązania Pythona 3 do deltarpm
+Group:		Libraries/Python
+# does not require base package
+
+%description -n python3-deltarpm
+This package contains Python 3 bindings for deltarpm.
+
+%description -n python3-deltarpm -l pl.UTF-8
+Ten pakiet zawiera wiązania Pythona 3 do deltarpm.
 
 %prep
 %setup -q
@@ -81,7 +99,9 @@ Ten pakiet zawiera wiązania Pythona do deltarpm.
 %patch2 -p1
 %patch3 -p1
 
+%if %{without python3}
 %{__sed} -i -e 's/python3//' Makefile
+%endif
 
 %build
 %{__make} \
@@ -114,6 +134,10 @@ rm -rf $RPM_BUILD_ROOT
 %py_ocomp $RPM_BUILD_ROOT%{py_sitedir}
 %py_comp $RPM_BUILD_ROOT%{py_sitedir}
 %py_postclean
+%if %{with python3}
+%py3_ocomp $RPM_BUILD_ROOT%{py3_sitedir}
+%py3_comp $RPM_BUILD_ROOT%{py3_sitedir}
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -147,3 +171,11 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{py_sitedir}/_deltarpmmodule.so
 %{py_sitedir}/deltarpm.py[co]
+
+%if %{with python3}
+%files -n python3-deltarpm
+%defattr(644,root,root,755)
+%attr(755,root,root) %{py3_sitedir}/_deltarpmmodule.so
+%{py3_sitedir}/deltarpm.py
+%{py3_sitedir}/__pycache__/deltarpm.cpython-*.py[co]
+%endif

@@ -1,5 +1,5 @@
---- deltarpm-3.6/Makefile	2015-02-01 13:27:11.084208113 +0200
-+++ deltarpm-3.6/Makefile	2015-02-01 13:26:31.965516931 +0200
+--- deltarpm-3.6.1/Makefile.orig	2018-05-12 13:26:28.431759384 +0200
++++ deltarpm-3.6.1/Makefile	2018-05-12 13:30:31.665089939 +0200
 @@ -9,9 +9,8 @@
  zlibcppflags=-I$(zlibdir)
  pylibprefix=/
@@ -42,7 +42,7 @@
 @@ -41,13 +46,13 @@
  			if [ ! -f "python$$PYVER/$@" ]; then \
  				mkdir -p python$$PYVER ;\
- 				$(CC) $(CFLAGS) $$PYCFLAGS $(zlibcppflag) -fPIC -c -o python$$PYVER/deltarpmmodule.o deltarpmmodule.c ;\
+ 				$(CC) $(CFLAGS) $$PYCFLAGS $(zlibcppflags) -fPIC -c -o python$$PYVER/deltarpmmodule.o deltarpmmodule.c ;\
 -				$(CC) $(LDFLAGS) -o python$$PYVER/$@ python$$PYVER/deltarpmmodule.o $^ -shared -Wl,-soname,_deltarpmmodule.so $(LDLIBS); \
 +				$(CC) $(LDFLAGS) -o python$$PYVER/$@ python$$PYVER/deltarpmmodule.o $^ -shared -Wl,-soname,_deltarpmmodule.so $(LIBS) $$PYLDFLAGS; \
  			fi; \
@@ -51,7 +51,7 @@
  
  $(zlibbundled):
 -	cd $(zlibdir) ; make CFLAGS="-fPIC $(CFLAGS)" libz.a
-+	cd $(zlibdir) ; make CPPFLAGS="$(CPPFLAGS)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" libz.a
++	cd $(zlibdir) ; make CPPFLAGS="$(CPPFLAGS)" CFLAGS="-fPIC $(CFLAGS)" LDFLAGS="$(LDFLAGS)" libz.a
  
  clean:
  	rm -f *.o
