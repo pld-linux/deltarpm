@@ -6,7 +6,7 @@ Summary:	Create deltas between rpms
 Summary(pl.UTF-8):	Generowanie różnic między pakietami rpm
 Name:		deltarpm
 Version:	3.6.1
-Release:	1
+Release:	2
 License:	BSD
 Group:		Base
 #Source0Download: https://github.com/rpm-software-management/deltarpm/releases
