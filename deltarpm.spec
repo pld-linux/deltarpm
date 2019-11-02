@@ -6,7 +6,7 @@ Summary:	Create deltas between rpms
 Summary(pl.UTF-8):	Generowanie różnic między pakietami rpm
 Name:		deltarpm
 Version:	3.6.1
-Release:	3
+Release:	4
 License:	BSD
 Group:		Base
 #Source0Download: https://github.com/rpm-software-management/deltarpm/releases
@@ -106,7 +106,7 @@ Ten pakiet zawiera wiązania Pythona 3 do deltarpm.
 %build
 %{__make} \
 	CC="%{__cc}" \
-	CFLAGS="%{rpmcflags} -I/usr/include/rpm" \
+	CFLAGS="%{rpmcflags} -I/usr/include/rpm -D_GNU_SOURCE" \
 	bindir=%{_bindir} \
 	libdir=%{_libdir} \
 	mandir=%{_mandir} \
