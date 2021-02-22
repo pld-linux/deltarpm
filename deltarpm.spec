@@ -1,12 +1,13 @@
 #
 # Conditional build:
 %bcond_without	python3	# CPython3 module
+%bcond_with	rpm5	# build with rpm5
 #
 Summary:	Create deltas between rpms
 Summary(pl.UTF-8):	Generowanie różnic między pakietami rpm
 Name:		deltarpm
 Version:	3.6.1
-Release:	4
+Release:	5
 License:	BSD
 Group:		Base
 #Source0Download: https://github.com/rpm-software-management/deltarpm/releases
@@ -96,7 +97,7 @@ Ten pakiet zawiera wiązania Pythona 3 do deltarpm.
 %setup -q
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
+%{?with_rpm5:%patch2 -p1}
 %patch3 -p1
 
 %if %{without python3}
