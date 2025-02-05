@@ -1,5 +1,6 @@
 #
 # Conditional build:
+%bcond_with	python2	# CPython2 module
 %bcond_without	python3	# CPython3 module
 %bcond_with	rpm5	# build with rpm5
 #
@@ -7,7 +8,7 @@ Summary:	Create deltas between rpms
 Summary(pl.UTF-8):	Generowanie różnic między pakietami rpm
 Name:		deltarpm
 Version:	3.6.3
-Release:	2
+Release:	3
 License:	BSD
 Group:		Base
 #Source0Download: https://github.com/rpm-software-management/deltarpm/tags
@@ -20,7 +21,7 @@ Patch3:		python-install.patch
 URL:		https://github.com/rpm-software-management/deltarpm
 BuildRequires:	bzip2-devel
 BuildRequires:	popt-devel
-BuildRequires:	python-devel >= 2
+%{?with_python2:BuildRequires:	python-devel >= 2}
 %{?with_python3:BuildRequires:	python3-devel >= 1:3.2}
 BuildRequires:	rpm-devel
 BuildRequires:	rpm-pythonprov
@@ -100,10 +101,6 @@ Ten pakiet zawiera wiązania Pythona 3 do deltarpm.
 %{?with_rpm5:%patch2 -p1}
 %patch -P 3 -p1
 
-%if %{without python3}
-%{__sed} -i -e 's/python3//' Makefile
-%endif
-
 %build
 %{__make} \
 	CC="%{__cc}" \
@@ -117,6 +114,7 @@ Ten pakiet zawiera wiązania Pythona 3 do deltarpm.
 	zlibcppflags=''
 
 %{__make} python \
+	PYTHONS="%{?with_python2:python} %{?with_python3:python3}" \
 	CC="%{__cc}" \
 	CFLAGS="%{rpmcflags}" \
 	bindir=%{_bindir} \
@@ -132,9 +130,12 @@ rm -rf $RPM_BUILD_ROOT
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
+%if %{with python2}
 %py_ocomp $RPM_BUILD_ROOT%{py_sitedir}
 %py_comp $RPM_BUILD_ROOT%{py_sitedir}
 %py_postclean
+%endif
+
 %if %{with python3}
 %py3_ocomp $RPM_BUILD_ROOT%{py3_sitedir}
 %py3_comp $RPM_BUILD_ROOT%{py3_sitedir}
@@ -168,10 +169,12 @@ rm -rf $RPM_BUILD_ROOT
 %attr(755,root,root) %{_bindir}/drpmsync
 %{_mandir}/man8/drpmsync.8*
 
+%if %{with python2}
 %files -n python-deltarpm
 %defattr(644,root,root,755)
 %attr(755,root,root) %{py_sitedir}/_deltarpmmodule.so
 %{py_sitedir}/deltarpm.py[co]
+%endif
 
 %if %{with python3}
 %files -n python3-deltarpm
