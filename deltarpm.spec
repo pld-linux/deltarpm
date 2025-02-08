@@ -7,17 +7,16 @@
 Summary:	Create deltas between rpms
 Summary(pl.UTF-8):	Generowanie różnic między pakietami rpm
 Name:		deltarpm
-Version:	3.6.3
-Release:	3
+Version:	3.6.5
+Release:	1
 License:	BSD
 Group:		Base
 #Source0Download: https://github.com/rpm-software-management/deltarpm/tags
 Source0:	https://github.com/rpm-software-management/deltarpm/archive/%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	8788682eaa329e467f00f096ced03051
+# Source0-md5:	d60921e36c8866cb5933e2002c1b3830
 Patch0:		%{name}-3.4-no-skip-doc.patch
 Patch1:		%{name}-3.4-pld.patch
 Patch2:		%{name}-rpm5.patch
-Patch3:		python-install.patch
 URL:		https://github.com/rpm-software-management/deltarpm
 BuildRequires:	bzip2-devel
 BuildRequires:	popt-devel
@@ -28,6 +27,7 @@ BuildRequires:	rpm-pythonprov
 BuildRequires:	rpmbuild(macros) >= 1.507
 BuildRequires:	xz-devel
 BuildRequires:	zlib-static
+BuildRequires:	zstd-devel
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -99,7 +99,6 @@ Ten pakiet zawiera wiązania Pythona 3 do deltarpm.
 %patch -P 0 -p1
 %patch -P 1 -p1
 %{?with_rpm5:%patch2 -p1}
-%patch -P 3 -p1
 
 %build
 %{__make} \
